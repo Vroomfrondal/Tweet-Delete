@@ -1,0 +1,20 @@
+# Library
+node_modules
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/*
+
+# API Keys
+.env
+
+# React
+build
+
+
+# Misc
+coverage
+dist
+
