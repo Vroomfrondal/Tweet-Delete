@@ -1,9 +1,17 @@
-# Fresh-Start-Twitter
+# Tweet-Delete
 
-This tool can be used to rapidly delete old tweets for a given timeframe.
+A lightweight tool for mass removing tweets from your timeline. Written in TypeScript for TS-node/NodeJS.
 
-### Dev Details
+## How to use:
+
+- Coming soon...
+
+## Dev Details
 
 - [Twitter V2 API](https://developer.twitter.com/en/docs/twitter-api/getting-started/about-twitter-api)
-- Utilizes Twitter's `OAuth 1.0a User Context` system to authenticate users based on app keys.
+
 - More documentation coming soon...
+
+### Authentication
+
+- Utilizes Twitter's `OAuth 1.0a User Context` system to authenticate users based on your developer account and application's app keys.

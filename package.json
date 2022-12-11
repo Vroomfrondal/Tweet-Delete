@@ -1,10 +1,11 @@
 {
   "name": "twitter-utilities",
   "version": "1.0.0",
-  "description": "Do cool things with the twitter API!",
+  "description": "Delete old tweets from your timeline.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
