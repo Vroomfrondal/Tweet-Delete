@@ -47,7 +47,7 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
     })
 
     if (paginatedRequest.meta.next_token) {
-      if (counter > 100) hasNextPage = false //! remove - using to control tweet flow instead of deleting all tweets
+      //   if (counter > 200) hasNextPage = false //! remove - using to control tweet flow instead of deleting all tweets
 
       const tweets: userTweetTypes[] = paginatedRequest['_realData'].data
       if (tweets) {
