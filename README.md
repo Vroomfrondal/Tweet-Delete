@@ -43,7 +43,7 @@
 
 - navigate to the root of the directory and run this CLI command:
   ```bash
-  ts-node src/index.ts
+  npm run start   // runs index.ts file inside /src
   ```
 - Enter your twitter username when prompted in the CLI (no @ sign)
 

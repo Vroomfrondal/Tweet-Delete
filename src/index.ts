@@ -1,11 +1,12 @@
-import rwClient from '../twitterConfig'
+import { rwClient, v1Client } from '../twitterConfig'
+import { userTweetTypes } from './typings'
 import sleep from '../src/utils/sleep'
 import readline from 'readline'
-import { userTweetTypes } from './typings'
 
 const getUserDetails = async (username: string) => {
   try {
     const request = await rwClient.v2.userByUsername(username)
+
     const userData = {
       ID: request.data.id,
       UserName: request.data.username,
@@ -26,7 +27,7 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
 
   // Loop over user's timeline and get all tweets
   console.log('Looking for tweets...')
-  const firstRequest = await rwClient.v2.userTimeline(user!.ID, { exclude: ['retweets'] })
+  const firstRequest = await rwClient.v2.userTimeline(user!.ID)
 
   const tweets: userTweetTypes[] = firstRequest['_realData'].data
   if (tweets) userTweets.push(tweets.map((tweet) => tweet))
@@ -41,12 +42,12 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
       pagination_token: nextToken,
       start_time: undefined,
       end_time: undefined,
-      exclude: ['retweets'], //"replies"
+      //   exclude: ['retweets'], //"replies"
     })
     const currToken = paginatedRequest.meta.next_token
 
     if (currToken) {
-      if (counter > 10) hasNextPage = false //! remove - using to control tweet flow
+      if (counter > 50) hasNextPage = false //! remove - using to control tweet flow
 
       const tweets: userTweetTypes[] = paginatedRequest['_realData'].data
       if (tweets) {
@@ -64,16 +65,19 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
   return userTweets.flat()
 }
 
-const deleteTweet = async (tweetID: string) => {
+const deleteTweetV1 = async (tweetID: string) => {
   try {
-    await rwClient.v2.deleteTweet(tweetID)
-    console.log(`Deleted tweet with ID of "${tweetID}"`)
-    sleep(500)
+    v1Client.post(`statuses/destroy/${tweetID}.json`, (res) => {
+      if (!res) console.log(`Deleted Tweet with ID of "${tweetID}..."`)
+      else console.log(res)
+    })
+
+    sleep(200)
   } catch (e) {
-    console.error(e)
+    throw new Error(`Failed with error: ${e}`)
   }
 
-  return `Removed tweet with ID of "${tweetID}" from your timeline.`
+  return `Done removing tweets`
 }
 
 const main = async () => {
@@ -86,16 +90,12 @@ const main = async () => {
     rl.question('Enter your twitter username: ', async (username) => {
       const tweets = (await getUserTweets(username)) as userTweetTypes[]
 
-      // deleting all tweets found
-      tweets.map((tweet) => {
-        console.log(tweet)
-        // deleteTweet(tweet.id)
-      })
-
-      console.log('Closing Program...')
+      // Removing tweets from timeline!
+      tweets.map(async (tweet) => await deleteTweetV1(tweet.id))
       rl.close()
     })
   })
 }
 
 main()
+// 4705 tweets
