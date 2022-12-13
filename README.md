@@ -1,7 +1,12 @@
 # Tweet-Delete 🐦
 
 🔨 A lightweight tool for mass removing tweets from your timeline 🔨
-❌ This will permanently erase tweets from your timeline with no recourse outside [backing up your tweets](https://help.twitter.com/en/managing-your-account/how-to-download-your-twitter-archive) ❌
+
+❌ This will permanently erase tweets from your timeline with no recourse outside [backing up your tweets](https://help.twitter.com/en/managing-your-account/how-to-download-your-twitter-archive). Tread carefully. ❌
+
+## Sample Image:
+
+<img width="429" alt="Screenshot 2022-12-12 at 11 36 54 PM" src="https://user-images.githubusercontent.com/49052244/207235346-75015d39-f772-47ae-843c-b951eb8141db.png">
 
 ## How to use:
 
@@ -28,7 +33,8 @@
   3. Create a new project/app (you're allowed one app per free twitter account).
   4. ❗Important❗ click **"User Authentication Setings"** and follow the prompts on screen to allow the app Read and Write permissions - otherwise you won't allow the Twitter API to read your profile and delete your tweets!
   5. Give a **name**, **description**, **website** (any url such as `https://www.google.com` or your own portfolio website), and **callback url** (just your ip address that you can find [here on google](https://www.google.com/search?q=what%27s+my+ip&oq=what%27s+my+ip&aqs=chrome..69i57j0i512j0i433i512j0i512l5.1283j1j7&sourceid=chrome&ie=UTF-8). I.e:`https://173.000.000.000`)
-  6. In the root of the directory create an `.env` file and copy/paste your new Twitter Apps Api Keys (don't wrap the values in parentheses or you'll get an error):
+  6. Apply for [elevated access](https://developer.twitter.com/en/portal/products/elevated) (its free) in order to use the V1 API for deleting tweets (must use v1 because v2 has a 50 tweet-limit per 15 minutes)
+  7. In the root of the directory create an `.env` file and copy/paste your new Twitter Apps Api Keys (don't wrap the values in parentheses or you'll get an error):
   ```js
   appKey = consumer_key
   appSecret = consumer_secret_key
@@ -50,6 +56,7 @@
 ### Dev Details
 
 - [Twitter V2 API](https://developer.twitter.com/en/docs/twitter-api/getting-started/about-twitter-api)
+- Uses the [Twitter V1 API](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-destroy-id) for deleting tweets to get around the V2 50-delete limit.
 - Written in TypeScript to run with TS-Node
 - The [dot-env](https://www.npmjs.com/package/dotenv) library and gitignore handle api keys. Commit to source comfortable if all keys are stored in your `.env` file.
 - Utilizes Twitter's `OAuth 1.0a User Context` system to authenticate users based on your developer account and application's app keys.
