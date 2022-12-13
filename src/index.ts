@@ -1,20 +1,11 @@
 import rwClient from '../twitterConfig'
 import sleep from '../src/utils/sleep'
-
-const newTweet = async (message: string) => {
-  try {
-    await rwClient.v2.tweet(message)
-    console.log(`Tweeted: "${message.slice(0, 10)}...". Check your profile.`)
-  } catch (e) {
-    console.error(e)
-  }
-}
+import readline from 'readline'
+import { userTweetTypes } from './typings'
 
 const getUserDetails = async (username: string) => {
-  // must be by specific name. For example. If you're "@JohnSmith", use "JohnSmith"
   try {
     const request = await rwClient.v2.userByUsername(username)
-
     const userData = {
       ID: request.data.id,
       UserName: request.data.username,
@@ -29,15 +20,15 @@ const getUserDetails = async (username: string) => {
 
 const getUserTweets = async (username: string, startTime?: string, endTime?: string) => {
   // Get user details
-  const userTweets = []
+  const userTweets: userTweetTypes[][] = []
   const user = await getUserDetails(username)
   if (!user) return ['No user for this username found.']
 
   // Loop over user's timeline and get all tweets
   console.log('Looking for tweets...')
-  const firstRequest = await rwClient.v2.userTimeline(user!.ID)
+  const firstRequest = await rwClient.v2.userTimeline(user!.ID, { exclude: ['retweets'] })
 
-  const tweets = firstRequest['_realData'].data
+  const tweets: userTweetTypes[] = firstRequest['_realData'].data
   if (tweets) userTweets.push(tweets.map((tweet) => tweet))
 
   // Start Paginating if theres more tweets
@@ -50,15 +41,14 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
       pagination_token: nextToken,
       start_time: undefined,
       end_time: undefined,
-      //   max_results: 100,
-      //   exclude: ['retweets', 'replies'],
+      exclude: ['retweets'], //"replies"
     })
     const currToken = paginatedRequest.meta.next_token
 
     if (currToken) {
-      if (counter > 5) hasNextPage = false //! remove - using to control tweet flow
+      if (counter > 10) hasNextPage = false //! remove - using to control tweet flow
 
-      const tweets = paginatedRequest['_realData'].data
+      const tweets: userTweetTypes[] = paginatedRequest['_realData'].data
       if (tweets) {
         console.log(`Searching page ${counter} for tweets...`)
         userTweets.push(tweets.map((tweet) => tweet))
@@ -74,30 +64,38 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
   return userTweets.flat()
 }
 
-const deleteTweets = async (tweetIDs: string[]) => {
-  let deleteCount = 0
+const deleteTweet = async (tweetID: string) => {
+  try {
+    await rwClient.v2.deleteTweet(tweetID)
+    console.log(`Deleted tweet with ID of "${tweetID}"`)
+    sleep(500)
+  } catch (e) {
+    console.error(e)
+  }
 
-  tweetIDs.map(async (tweetID: string) => {
-    try {
-      await rwClient.v2.deleteTweet(tweetID)
-      console.log(`Deleted tweet with ID of "${tweetID}"`)
-      deleteCount++
-      sleep(500)
-    } catch (e) {
-      console.error(e)
-    }
-  })
-
-  return `Removed ${deleteCount} tweets from your timeline.`
+  return `Removed tweet with ID of "${tweetID}" from your timeline.`
 }
 
 const main = async () => {
-  const tweets = await getUserTweets('chrisdeleon64')
+  await new Promise(() => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
 
-  // tweets is an array of objects. loop through and delete each by id
-  // tweets.map((tweet) => console.log(tweet))
-  console.log(typeof tweets[0])
-  console.log(tweets[0])
+    rl.question('Enter your twitter username: ', async (username) => {
+      const tweets = (await getUserTweets(username)) as userTweetTypes[]
+
+      // deleting all tweets found
+      tweets.map((tweet) => {
+        console.log(tweet)
+        // deleteTweet(tweet.id)
+      })
+
+      console.log('Closing Program...')
+      rl.close()
+    })
+  })
 }
 
 main()

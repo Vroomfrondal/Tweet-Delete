@@ -7,10 +7,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
-
-    /* Type Checking */
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src", "twitterConfig.ts"]
+  "include": ["src", "twitterConfig.ts"],
+  "typeRoots": ["src/typings/"]
 }

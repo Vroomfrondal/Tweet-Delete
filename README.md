@@ -1,6 +1,7 @@
 # Tweet-Delete 🐦
 
 🔨 A lightweight tool for mass removing tweets from your timeline 🔨
+❌ This will permanently erase tweets from your timeline with no recourse outside [backing up your tweets](https://help.twitter.com/en/managing-your-account/how-to-download-your-twitter-archive) ❌
 
 ## How to use:
 
@@ -40,7 +41,11 @@
 
 ### 3) Using the script
 
-- details coming soon...
+- navigate to the root of the directory and run this CLI command:
+  ```bash
+  ts-node src/index.ts
+  ```
+- Enter your twitter username when prompted in the CLI (no @ sign)
 
 ### Dev Details
 
