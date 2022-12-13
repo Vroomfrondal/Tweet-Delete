@@ -21,6 +21,7 @@ const getUserDetails = async (username: string) => {
 
 const getUserTweets = async (username: string, startTime?: string, endTime?: string) => {
   // Get user details
+  let counter = 0
   const userTweets: userTweetTypes[][] = []
   const user = await getUserDetails(username)
   if (!user) return ['No user for this username found.']
@@ -33,21 +34,20 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
   if (tweets) userTweets.push(tweets.map((tweet) => tweet))
 
   // Start Paginating if theres more tweets
-  let counter = 0
   let hasNextPage = true
   let nextToken = firstRequest.meta.next_token
 
   while (hasNextPage) {
     const paginatedRequest = await rwClient.v2.userTimeline(user!.ID, {
       pagination_token: nextToken,
-      start_time: undefined,
-      end_time: undefined,
-      //   exclude: ['retweets'], //"replies"
+      //   start_time: undefined,
+      //   end_time: undefined,
+      //   max_results: 10,
+      //   exclude: ['retweets', 'replies'], //
     })
-    const currToken = paginatedRequest.meta.next_token
 
-    if (currToken) {
-      if (counter > 50) hasNextPage = false //! remove - using to control tweet flow
+    if (paginatedRequest.meta.next_token) {
+      if (counter > 100) hasNextPage = false //! remove - using to control tweet flow instead of deleting all tweets
 
       const tweets: userTweetTypes[] = paginatedRequest['_realData'].data
       if (tweets) {
@@ -55,7 +55,7 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
         userTweets.push(tweets.map((tweet) => tweet))
       }
 
-      nextToken = currToken
+      nextToken = paginatedRequest.meta.next_token
       counter++
     } else hasNextPage = false
   }
@@ -66,18 +66,19 @@ const getUserTweets = async (username: string, startTime?: string, endTime?: str
 }
 
 const deleteTweetV1 = async (tweetID: string) => {
+  let deleteCount = 0
   try {
-    v1Client.post(`statuses/destroy/${tweetID}.json`, (res) => {
-      if (!res) console.log(`Deleted Tweet with ID of "${tweetID}..."`)
-      else console.log(res)
+    v1Client.post(`statuses/destroy/${tweetID}.json`, () => {
+      deleteCount++
     })
 
-    sleep(200)
+    console.log(`Found tweet with ID of "${tweetID}"`)
+    sleep(50)
   } catch (e) {
     throw new Error(`Failed with error: ${e}`)
   }
 
-  return `Done removing tweets`
+  return console.log(`Deleted a total of ${deleteCount} tweets from your timeline`)
 }
 
 const main = async () => {
@@ -98,4 +99,3 @@ const main = async () => {
 }
 
 main()
-// 4705 tweets
